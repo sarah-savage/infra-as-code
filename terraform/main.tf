@@ -7,6 +7,21 @@ terraform {
   }
 }
 
+
+variable "do_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "do_public_key" {
+  description = "Public SSH key for DigitalOcean"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 provider "digitalocean" {
   token = var.do_token
 }
