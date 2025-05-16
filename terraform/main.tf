@@ -15,20 +15,12 @@ variable "do_token" {
   default     = ""
 }
 
-variable "do_public_key" {
-  description = "Public SSH key for DigitalOcean"
-  type        = string
-  sensitive   = true
-  default     = ""
-}
-
 provider "digitalocean" {
   token = var.do_token
 }
 
-resource "digitalocean_ssh_key" "default" {
-  name       = "wpc-ssh-key"
-  public_key = var.do_public_key
+data "digitalocean_ssh_key" "default" {
+  name = "WPConcierge AWS Key"
 }
 
 resource "digitalocean_droplet" "wpc" {
