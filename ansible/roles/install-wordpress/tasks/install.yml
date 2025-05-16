@@ -1,0 +1,23 @@
+---
+- name: Install WordPress
+  command: "wp core download --path={{ item.item.doc_root}}"
+  become: yes
+  become_user: sarah
+
+- name: Create wp-config.php
+  command: "wp config create --dbname={{ item.item.db_name }} --dbuser={{ item.item.db_user }} --dbpass={{ item.item.db_password }} --path={{ item.item.doc_root }}"
+  become_user: sarah
+
+- name: Install WordPress
+  command: "wp core install --url={{ item.item.site_url }} --title='{{ item.item.site_name }}' --admin_user={{ item.item.admin_user }} --admin_password={{ item.item.admin_password }} --admin_email={{ item.item.admin_email }} --path={{ item.item.doc_root }} --skip-email"
+  become: yes
+  become_user: sarah
+  no_log: true
+
+- name: Chmod docroot
+  file:
+    path: "{{ item.item.doc_root }}"
+    owner: www-data
+    group: www-data
+    recurse: yes
+    state: directory

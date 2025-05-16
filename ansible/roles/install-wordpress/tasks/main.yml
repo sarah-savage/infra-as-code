@@ -2,12 +2,10 @@
 - name: Check for WordPress existing
   find:
     path: "{{ item.doc_root }}"
-  loop: "{{ sites }}"
+  loop: "{{ wordpress_sites }}"
   register: files_exist
 
 - name: Install WordPress
-  command: "wp core download --path={{ item.item.doc_root}}"
+  include_tasks: install.yml
   loop: "{{ files_exist.results }}"
   when: item.matched == 0
-  become: yes
-  become_user: sarah

@@ -34,7 +34,8 @@ mysql_users:
 
 wordpress_sites:
   - site_name: "WPConcierge Test Site"
-    doc_root: /var/www/wpc/wpconcierge.org
+    site_url: wpc.wpconcierge.org
+    doc_root: /var/www/wpc.wpconcierge.org
     db_name: wpconcierge
     db_user: wpconcierge
     db_password: "{{ wpconcierge_mysql_password }}"
