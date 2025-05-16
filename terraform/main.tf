@@ -1,53 +1,43 @@
-provider "aws" {
-  region = "us-east-2"
+provider "digitalocean" {
+  token = var.do_token
 }
 
-# To generate the SSH key pair for this instance, run:
-#   ssh-keygen -t ed25519 -f example-key
-# This will create example-key (private) and example-key.pub (public) in this repo.
-# Ensure example-key.pub exists before applying this Terraform.
-
-resource "aws_key_pair" "example_key" {
-  key_name   = "example-key"
-  public_key = file("${path.module}/example-key.pub")
+variable "do_token" {
+  type        = string
+  description = "DigitalOcean API token"
+  default     = "" # Set via environment variable DO_TOKEN
+  sensitive   = true
 }
 
-resource "aws_security_group" "graviton_sg" {
-  name        = "graviton-sg"
-  description = "Allow HTTP, HTTPS, and SSH"
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+variable "do_public_key" {
+  type        = string
+  description = "SSH public key for droplet"
+  default     = "" # Set via environment variable DO_PUBLIC_KEY
+  sensitive   = true
 }
 
-resource "aws_instance" "graviton_instance" {
-  ami           = "ami-0e8a34246278c21e4" # Ubuntu 24.04 ARM64 us-east-2
-  instance_type = "t4g.micro"
-  key_name      = aws_key_pair.example_key.key_name
-  vpc_security_group_ids = [aws_security_group.graviton_sg.id]
+resource "digitalocean_ssh_key" "default" {
+  name       = "wpc-ssh-key"
+  public_key = var.do_public_key
+}
 
-  tags = {
-    Name = "graviton-free-tier"
-  }
+resource "digitalocean_droplet" "wpc" {
+  name     = "wpc"
+  region   = "nyc3"
+  size     = "s-1vcpu-1gb"
+  image    = "ubuntu-24-04-x64"
+  ssh_keys = [digitalocean_ssh_key.default.id]
+  tags     = ["wpconcierge"]
+}
+
+resource "digitalocean_domain" "wpconcierge_org" {
+  name = "wpconcierge.org"
+}
+
+resource "digitalocean_record" "wpc" {
+  domain = digitalocean_domain.wpconcierge_org.name
+  type   = "A"
+  name   = "wpc"
+  value  = digitalocean_droplet.wpc.ipv4_address
+  ttl    = 300
 }

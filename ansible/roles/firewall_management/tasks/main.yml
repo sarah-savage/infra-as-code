@@ -1,0 +1,18 @@
+---
+- name: Allow SSH Through Firewall
+  ufw:
+    rule: allow
+    name: OpenSSH
+    state: reloaded
+
+- name: Allow HTTP Through Firewall
+  ufw:
+    rule: allow
+    port: 80
+    state: reloaded
+
+- name: Allow HTTPS Through Firewall
+  ufw:
+    rule: allow
+    port: 443
+    state: reloaded

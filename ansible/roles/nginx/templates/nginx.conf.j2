@@ -1,0 +1,53 @@
+server {
+    server_name {{ item.server_name }} {{ item.server_alias }};
+    client_max_body_size {{ client_max_body_size }};
+    large_client_header_buffers 8 16k;
+
+    root {{ item.doc_root }};
+
+    index index.html index.htm index.php;
+
+    charset utf-8;
+
+    proxy_send_timeout {{ max_execution }}s;
+    proxy_read_timeout {{ max_execution }}s;
+    fastcgi_send_timeout {{ max_execution }}s;
+    fastcgi_read_timeout {{ max_execution }}s;
+
+    location = /favicon.ico { log_not_found off; access_log off; }
+    location = /robots.txt  {
+        log_not_found off;
+        access_log off;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        include fastcgi_params;
+        fastcgi_pass {{ fast_cgi_pass }};
+    }
+
+    location / {
+        try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+        fastcgi_pass {{ fast_cgi_pass }};
+    }
+
+    error_page 404 /index.php;
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+{% if certbot_certs is defined %}
+    listen 443 ssl;
+    ssl_certificate /etc/letsencrypt/live/{{ item.server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ item.server_name }}/privkey.pem;
+{% else %}
+    listen 80;
+{% endif %}
+
+}

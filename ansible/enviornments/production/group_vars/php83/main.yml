@@ -1,0 +1,14 @@
+---
+# php configurations
+gc_maxlifetime: 3600
+memory_limit: 512M
+max_execution: 300
+upload_max_filesize: 256M
+max_input: 60
+
+memory_limit_cli: 512M
+max_execution_cli: 300
+
+# Nginx Configs
+client_max_body_size: 256M
+fast_cgi_pass: unix:/run/php/php8.3-fpm.sock

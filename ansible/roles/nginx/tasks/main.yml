@@ -1,0 +1,52 @@
+---
+
+- name: Add Nginx Apt Repo
+  apt_repository:
+    repo: ppa:ondrej/nginx
+
+- name: Install Nginx
+  package:
+    name: nginx
+    state: present
+
+- name: Create document root directories for each site
+  file:
+    path: "{{ item.doc_root }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0775'
+  loop: "{{ sites }}"
+  when: item.doc_root is defined
+
+- name: Create Nginx configuration for each site
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/{{ item.site_name }}
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ sites }}"
+
+- name: Enable sites by creating symlinks
+  file:
+    src: /etc/nginx/sites-available/{{ item.site_name }}
+    dest: /etc/nginx/sites-enabled/{{ item.site_name }}
+    state: link
+  loop: "{{ sites }}"
+
+- name: Remove default Nginx configuration
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Test Nginx configuration
+  command: nginx -t
+  register: nginx_test
+  changed_when: false
+
+- name: Reload Nginx if configuration is valid
+  service:
+    name: nginx
+    state: reloaded
+  when: nginx_test.rc == 0

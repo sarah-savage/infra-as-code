@@ -1,0 +1,34 @@
+---
+
+# A list of users that should be given rights with SSH. Only groups is optional.
+ssh_users:
+  - name: sarah
+    password: "{{ vault_sarah_password }}"
+    groups: sudo,wpc,www-data
+
+ssh_user_keys:
+  - name: sarah
+    ssh_key: https://github.com/sarah-savage.keys
+
+sites:
+  - site_name: wpconcierge.com
+    server_name: wpconcierge.com
+    server_alias: www.wpconcierge.com
+    doc_root: /var/www/wpconcierge.com
+
+certbot_create_if_missing: true
+certbot_certs:
+  - email: sarah@wpconcierge.com
+    domains:
+      - wpconcierge.com
+      - www.wpconcierge.com
+
+mysql_databases:
+  - name: wpconcierge
+
+mysql_users:
+  - name: wpconcierge
+    host: '%'
+    password: "{{ wpconcierge_mysql_password }}"
+    priv: wpconcierge.*:ALL
+    state: present

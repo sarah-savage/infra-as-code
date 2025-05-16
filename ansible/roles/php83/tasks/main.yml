@@ -1,0 +1,50 @@
+---
+- name: Add Apt Repo
+  apt_repository:
+    repo: ppa:ondrej/php
+
+- name: Install PHP 8.3
+  package:
+    name:
+      - php8.3
+      - php8.3-common
+      - php8.3-fpm
+      - php8.3-imagick
+      - php8.3-gd
+      - php8.3-mysql
+      - php8.3-zip
+      - php8.3-exif
+      - php8.3-opcache
+      - php8.3-intl
+      - php8.3-curl
+      - php-pear
+      - php8.3-igbinary
+      - php8.3-redis
+      - php8.3-dev
+      - php8.3-xml
+      - php8.3-mbstring
+
+- name: Install PECL Packages
+  community.general.pear:
+    name: pecl/timezonedb
+    state: present
+
+- name: Install PHP INI
+  template:
+    src: templates/php.ini.j2
+    dest: /etc/php/8.3/fpm/php.ini
+    owner: root
+    mode: '0644'
+
+- name: Install PHP INI (CLI)
+  template:
+    src: templates/php-cli.ini.j2
+    dest: /etc/php/8.3/cli/php.ini
+    owner: root
+    mode: '0644'
+
+- name: Symlink PHP
+  file:
+    src: /usr/bin/php8.3
+    dest: /usr/bin/php
+    state: link

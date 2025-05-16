@@ -1,0 +1,39 @@
+---
+- name: Add WPC Group
+  group:
+    name: wpc
+    state: present
+
+- name: Create Users
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups | default('') }}"
+    append: true
+    shell: /bin/bash
+    password: "{{ item.password }}"
+  with_items: "{{ ssh_users }}"
+  no_log: true
+
+- name: Add User Keys
+  authorized_key:
+    user: "{{ item.name }}"
+    state: present
+    key: "{{ item.ssh_key }}"
+  with_items: " {{ ssh_user_keys }}"
+  no_log: true
+
+- name: Update SSH Config
+  copy:
+    src: ./files/sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify: Bounce SSH
+
+- name: Make Sudo Group Work
+  lineinfile:
+    path: /etc/sudoers
+    state: present
+    regexp: '^%sudo\s'
+    line: '%sudo ALL=(ALL) NOPASSWD: ALL'

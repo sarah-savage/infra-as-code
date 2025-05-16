@@ -1,0 +1,32 @@
+---
+- name: Update Packages
+  apt: upgrade=full update_cache=true force=yes
+  register: packages_updated
+
+- name: Install Aptitude
+  apt: pkg=aptitude state=present
+  register: aptitude_installed
+
+- name: Install Base Packages
+  when: packages_updated.failed is false
+  apt: pkg={{item}} state=latest
+  with_items:
+    - python3-pip
+    - build-essential
+    - curl
+    - fail2ban
+    - gcc
+    - git
+    - libmcrypt4
+    - libpcre3-dev
+    - make
+    - supervisor
+    - ufw
+    - unattended-upgrades
+    - unzip
+    - whois
+    - zsh
+
+- name: Set The Timezone
+  copy: src=./files/timezone dest=/etc/timezone
+  notify: Update Timezone
