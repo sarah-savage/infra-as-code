@@ -1,0 +1,8 @@
+---
+roles:
+  - name: geerlingguy.mysql
+  - name: geerlingguy.certbot
+
+collections:
+  - name: community.mysql
+  - name: community.general

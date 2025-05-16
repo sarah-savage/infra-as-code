@@ -23,11 +23,13 @@
       - php8.3-dev
       - php8.3-xml
       - php8.3-mbstring
+  notify: Restart PHP
 
 - name: Install PECL Packages
   community.general.pear:
     name: pecl/timezonedb
     state: present
+  notify: Restart PHP
 
 - name: Install PHP INI
   template:
@@ -35,6 +37,7 @@
     dest: /etc/php/8.3/fpm/php.ini
     owner: root
     mode: '0644'
+  notify: Restart PHP
 
 - name: Install PHP INI (CLI)
   template:
@@ -42,6 +45,7 @@
     dest: /etc/php/8.3/cli/php.ini
     owner: root
     mode: '0644'
+  notify: Restart PHP
 
 - name: Symlink PHP
   file:

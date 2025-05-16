@@ -31,3 +31,13 @@ mysql_users:
     password: "{{ wpconcierge_mysql_password }}"
     priv: wpconcierge.*:ALL
     state: present
+
+wordpress_sites:
+  - site_name: "WPConcierge Test Site"
+    doc_root: /var/www/wpc/wpconcierge.org
+    db_name: wpconcierge
+    db_user: wpconcierge
+    db_password: "{{ wpconcierge_mysql_password }}"
+    admin_user: Sarah
+    admin_password: "{{ wpconcierge_admin_password }}"
+    admin_email: sarah@wpconcierge.org
