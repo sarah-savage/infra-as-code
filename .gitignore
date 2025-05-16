@@ -11,3 +11,6 @@ override.tf.json
 
 # Ignore PhpStorm project files
 .idea/
+
+# Ignore Ansible Vault files
+vault.yml
